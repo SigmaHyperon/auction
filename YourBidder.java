@@ -1,70 +1,67 @@
-package auction.bidders.examples;
+package auction.bidders.external;
 
 import auction.Bidder;
 
 
 /**
- * @author ???        
+ * @author ???          -------Bitte hier ausfüllen--------
  */
 public class YourBidder implements Bidder {
 
     /** The next bid. */
-    private int totalQuantity;
-    private int totalRounds;
-    private int totalCash;
+    private int avgBid;
     
+    private int initCash;
     private int cash;
-    private int wonQuantity;
-    
     private int opponentCash;
+    private double opponentAvg;
     
+    private int totalRounds;
     private int round;
-    private int avg;
 
     @Override
     public void init(final int quantity, final int cash) {
-        this.totalQuantity = quantity;
-        this.totalRounds = (int)(quantity/2);
-        this.totalCash = cash;
-        
+    	this.initCash = cash;
     	this.cash = cash;
-        this.wonQuantity = 0;
-        
-        this.opponentCash = cash;
-        
-        this.round = 0;
-        this.avg = (int)(this.totalCash/this.totalRounds);
+    	this.opponentCash = cash;
+    	this.avgBid = cash/quantity;
+    	this.round = 0;
+    	this.totalRounds = quantity;
     }
 
     @Override
     public int placeBid() {
-    	if (this.round > this.totalQuantity / 35) {
-            if(this.totalRounds - this.round >= this.cash/2){
-                return 2;
-            }
-            int avg = (this.totalCash - this.opponentCash) / this.round;
-            return (int)(avg*(
-                        1.75
-                        +0.15*(this.totalRounds-this.round)/this.totalRounds)
-                        //+1*(0.6-((this.round*2-this.wonQuantity)/(this.round*2)))
-                    )
-                    //+((Math.random() > 0.5) ? 1 : 0)
-                    ;
+    	
+        /** Calculate your next bid here. */
+    	if(round > (this.totalRounds/35)){
+	    	
+	    	if(this.opponentCash > 0)
+	    	{
+	    		double avg = (this.initCash-this.opponentCash)/this.round;
+	    		if(avg*2 < this.cash){
+	    			//return (int)((int)(avg*2)+(avg*0.2*((Math.random()-0.5)*2)));
+	    			return (int)(avg*2);
+	    		} else {
+	    			return this.cash;
+	    		}
+	    	} else {
+	    		if(this.cash > 0){
+	    			return 1;
+	    		} else {
+	    			return 0;
+	    		}
+	    	}
     	} else {
-            return 0;
-        }
+    		return 0;
+    	}
+    	
     }
 
     @Override
     public void bids(final int own, final int other) {
     	this.cash -= own;
-        this.opponentCash -= other;
-        if(own > other){
-            this.wonQuantity += 2;
-        } else if(own == other){
-            this.wonQuantity++;
-        }
-        this.round ++;
+    	this.opponentCash -= other;
+    	this.round++;
     }
 
 }
