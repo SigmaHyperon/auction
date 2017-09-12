@@ -2,6 +2,8 @@ package auction.bidders.external;
 
 import auction.Bidder;
 import static java.lang.Math.min;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -10,6 +12,8 @@ import static java.lang.Math.min;
 public class AdaptiveBidder implements Bidder {
 
     /** The next bid. */
+    private static Map<Integer, List<Integer>> stats;
+    
     private int totalQuantity;
     private int totalRounds;
     private int totalCash;
@@ -32,9 +36,12 @@ public class AdaptiveBidder implements Bidder {
 
     @Override
     public void init(final int quantity, final int cash) {
+        
         this.totalQuantity = quantity;
         this.totalRounds = (int)(quantity/2);
         this.totalCash = cash;
+
+        
         
     	this.cash = cash;
         this.wonQuantity = 0;
@@ -55,28 +62,44 @@ public class AdaptiveBidder implements Bidder {
 
     @Override
     public int placeBid() {
-    	if((this.cash/(this.totalRounds-this.round)) <= (double)5 || this.beatDown){
-    		this.beatDown = true;
-    		if(this.previousOpponent <= 10){
-    			//return (this.previousOpponent+1 > this.cash/((this.totalQuantity/2+1)-this.wonQuantity)) ? this.previousOpponent+1 : this.cash/((this.totalQuantity/2+1)-this.wonQuantity) ;
-    			return this.previousOpponent+1;
-    		}
-    		return 2;
+        
+        /**
+         * Beatdown Phase
+         */
+    	if((this.cash/(this.totalRounds-this.round)) <= (double)7 || this.beatDown){
+            /*int necessary = ((this.totalQuantity/2)+1) - this.wonQuantity;
+            if(necessary <= 0 ) return 1;
+            this.beatDown = true;
+            int avgLeft = this.cash / necessary;
+            if(Math.random() > 0.2){
+                return (int)(avgLeft*(1+Math.random()));
+            } else if(this.totalRounds-this.round <= necessary+2){
+                return (int)(avgLeft*(1+Math.random()));
+            }*/
+            if(this.previousOpponent <= 10){
+                    //return (this.previousOpponent+1 > this.cash/((this.totalQuantity/2+1)-this.wonQuantity)) ? this.previousOpponent+1 : this.cash/((this.totalQuantity/2+1)-this.wonQuantity) ;
+                    return this.previousOpponent+1;
+            }
+            return 0;
     	}
+        /**
+         * main block
+         */
         if(this.previous > this.previousOpponent) {
+            //if we won adjust downwards (midway between our and the enemies last bid
             return (int)((this.previousOpponent+this.previous)/2)+1;
 //        	return this.previousOpponent + 1;
         } else if(this.previous == this.previousOpponent) {
             return this.previous + 1; 
         } else {
-        	if(this.progress < 0.75){
-        		if(this.previous == this.threshold){
-        			return 1;
-        		}
-        		return min(this.previous + (int)((this.totalRounds-this.round*0.7)*0.9) + 1,this.threshold);
-        	} else {
-        		return 1;
-        	}
+            if(this.progress < 0.75){
+                if(this.previous == this.threshold && this.previous < this.previousOpponent && Math.random() > 0.5){
+                        return 1;
+                }
+                return min(this.previous + (int)((this.totalRounds-this.round*0.7)*0.9) + 1,this.threshold);
+            } else {
+                return 1;
+            }
             
         }
         

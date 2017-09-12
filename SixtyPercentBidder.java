@@ -1,4 +1,4 @@
-package auction.bidders.examples;
+package auction.bidders.external;
 
 import auction.Bidder;
 
@@ -6,7 +6,7 @@ import auction.Bidder;
 /**
  * @author ???        
  */
-public class sixtyRandomBidder implements Bidder {
+public class SixtyPercentBidder implements Bidder {
 
     /** The next bid. */
     private int totalQuantity;
@@ -37,7 +37,7 @@ public class sixtyRandomBidder implements Bidder {
     @Override
     public int placeBid() {
         int avg = (int)(this.totalCash/(this.totalRounds*0.6));
-        return (Math.random() >= 0.4) ? avg : 0;
+        return avg;
     }
 
     @Override

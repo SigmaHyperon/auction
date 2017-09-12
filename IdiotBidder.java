@@ -1,4 +1,4 @@
-package auction.bidders.examples;
+package auction.bidders.external;
 
 import auction.Bidder;
 
@@ -6,7 +6,7 @@ import auction.Bidder;
 /**
  * @author ???        
  */
-public class idiotBidder implements Bidder {
+public class IdiotBidder implements Bidder {
 
     /** The next bid. */
     private int totalQuantity;
